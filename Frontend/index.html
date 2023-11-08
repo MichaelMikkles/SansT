@@ -132,12 +132,25 @@
                 text-align: center;
                 padding: 10px;
             }
+
+            .buttons{
+                display: flex;
+                flex-direction: column;
+                width: 100px;
+            }
+
+            .buttons #reset-counters{
+                align-items: center;
+                margin: 5px auto;
+            }
+
+
         </style>
     </header>
     <nav>
         <ul>
             <li><a href="#" id="home-link">Home</a></li>
-            <li><a href="#" id="command-link">Commander</a></li>
+            <li><a href="#" id="command-link">Mes demandes</a></li>
             <li><a href="#" id="login-link">Login</a></li>
         </ul>
     </nav>
@@ -157,20 +170,33 @@
         </div>
     </div>
 
+    <div id="admin-content">
+        <h1>Patients</h1>
+        <ul id="user-list">
+        </ul>
+    </div>
+
     <main id="home-content">
         <div class="menu">
             <div class="med">
                 <h2> Doliprane</h2>
                 <img src="doliprane.jpg" alt="doliprane.jpg">
                 <p>Le Doliprane est un médicament à base de paracétamol qui soulage la douleur, comme les maux de tête, et abaisse la fièvre en inhibant les substances chimiques responsables de la douleur et de la fièvre dans le cerveau.</p>
-                <button id="add">Add</button>
+                <button id="add-doliprane">Add</button>
+                <span id="counter-doliprane">0</span>
             </div>
-
+            
             <div class="med">
                 <h2> Tramadol</h2>
                 <img class="tramadol" src="tramadol.jpg" alt="tramadol.jpg">
                 <p>Le Tramadol est un médicament analgésique utilisé pour soulager la douleur modérée à sévère. Il agit en modifiant la façon dont le cerveau perçoit la douleur.</p>
-                <button id="add">Add</button>
+                <button id="add-tramadol">Add</button>
+                <span id="counter-tramadol">0</span>
+            </div>
+
+            <div class="buttons">
+                <button id="reset-counters">Reinitializer</button>
+                <button id="reset-counters" class="commander">Commander</button>
             </div>
         </div>
     </main>
@@ -184,16 +210,19 @@
         function mostrarHome() {
             document.getElementById('home-content').style.display = 'block';
             document.getElementById('login-container').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'none';
         }
 
         function mostrarLogin() {
             document.getElementById('home-content').style.display = 'none';
             document.getElementById('login-container').style.display = 'block';
+            document.getElementById('admin-content').style.display = 'none';
         }
 
         function mostrarAdmin() {
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
+            document.getElementById('home-content').style.display = 'none';
         }
 
         // Agregar eventos a los enlaces
@@ -231,13 +260,72 @@
                 if (username === "999") {
                     mostrarAdmin();
                 }
-                //alert("Inicio de sesión exitoso.");
-                mostrarHome();
-                // Redirigir al usuario a la página principal, realizar otras acciones, etc.
+                else{
+                    //alert("Inicio de sesión exitoso.");
+                    mostrarHome();
+                }
+                return false;
             } else {
                 alert("Identifiant et mot de passe incorrect");
             }
         }
+
+        function mostrarUsuarios() {
+            var userList = document.getElementById('user-list');
+
+            // Limpiar la lista de usuarios antes de agregar nuevos usuarios
+            userList.innerHTML = '';
+
+            // Generar y agregar elementos de lista para cada usuario
+            usuarios.forEach(function(usuario) {
+                var listItem = document.createElement('li');
+                listItem.textContent = 'Patient: ' + usuario.username + ', mot de passe: ' + usuario.password;
+                userList.appendChild(listItem);
+            });
+        }
+
+        // Llama a la función para mostrar la lista de usuarios cuando la página se cargue
+        window.addEventListener('load', mostrarUsuarios);
+
+        // Agrega contadores y manejo de botones
+        var counterDoliprane = 0;
+        var counterTramadol = 0;
+
+        document.getElementById('add-doliprane').addEventListener('click', function() {
+            counterDoliprane++;
+            document.getElementById('counter-doliprane').textContent = counterDoliprane;
+        });
+
+        document.getElementById('add-tramadol').addEventListener('click', function() {
+            counterTramadol++;
+            document.getElementById('counter-tramadol').textContent = counterTramadol;
+        });
+
+        document.getElementById('reset-counters').addEventListener('click', function() {
+            counterDoliprane = 0;
+            counterTramadol = 0;
+            document.getElementById('counter-doliprane').textContent = counterDoliprane;
+            document.getElementById('counter-tramadol').textContent = counterTramadol;
+        });
+
+        document.querySelector('.commander').addEventListener('click', function() {
+            var cantidadDoliprane = counterDoliprane;
+            var cantidadTramadol = counterTramadol;
+        
+            var mensaje = "Vous avez commandé:\n";
+            if (cantidadDoliprane > 0) {
+                mensaje += cantidadDoliprane + " Doliprane\n";
+            }
+            if (cantidadTramadol > 0) {
+                mensaje += cantidadTramadol + " Tramadol\n";
+            }
+        
+            if (cantidadDoliprane === 0 && cantidadTramadol === 0) {
+                mensaje = "Aucun médicament sélectionné.";
+            }
+        
+            alert(mensaje);
+        });
     </script>
 </body> 
 </html>
