@@ -1,41 +1,243 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PharmaBox</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--<link rel="stylesheet" type="text/css" href="styles.css">-->
 </head>
 <body>
     <header>
         <h1>PharmaBox</h1>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f0f0f0;
+            }
+    
+            header {
+                background-color: #41981c;
+                color: #fff;
+                text-align: center;
+                padding: 20px;
+            }
+    
+            nav ul {
+                list-style: none;
+                padding: 0;
+                text-align: center;
+            }
+    
+            nav li {
+                display: inline;
+                margin-right: 20px;
+            }
+    
+            nav a {
+                text-decoration: none;
+                color: #41981c;
+            }
+    
+            #login-container {
+                display: block; 
+                background-color: #fff;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                padding: 20px;
+                text-align: center;
+            }
+    
+            #login-container h1 {
+                margin: 0;
+                color: #333;
+            }
+    
+            #login-container form {
+                display: flex;
+                flex-direction: column;
+            }
+    
+            #login-container label {
+                margin: 10px 0;
+            }
+    
+            #login-container input {
+                padding: 10px;
+                margin: 5px 0;
+                border: 1px solid #ccc;
+                border-radius: 3px;
+                font-size: 16px;
+            }
+    
+            #login-container button {
+                background-color: #ffd700;
+                color: #fff;
+                padding: 10px;
+                border: none;
+                border-radius: 3px;
+                cursor: pointer;
+                font-size: 18px;
+            }
+    
+            #login-container button:hover {
+                background-color: #ffef00;
+            }
+
+            .login-container-outer {
+                max-width: 400px; /* Establece el ancho máximo que desees */
+                margin: 30px auto; /* Centra el contenedor horizontalmente en la página */
+            }
+            
+    
+            #home-content {
+                display: none; /* Por defecto oculto */
+            }
+    
+            #home-content .menu {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px; /* Agrega un espacio entre los contenedores .med */
+            }
+    
+            #home-content .med {
+                display: flex;
+                flex-direction: column; /* Apila los elementos verticalmente */
+                align-items: flex-start; /* Alinea los elementos a la izquierda */
+                text-align: left; /* Alinea el texto a la izquierda */
+            }
+    
+            #home-content .med h2 {
+                margin: 10px; 
+            }
+    
+            #home-content .med img {
+                width: auto;
+                height: 100px;
+                margin: 10px; 
+            }
+    
+            #home-content .med p {
+                margin: 10px; 
+            }
+    
+            #home-content #add {
+                margin: 10px; /* Agrega un espacio entre el párrafo y el botón */
+                align-self: flex-start; /* Alinea el botón a la izquierda */
+            }
+
+            footer {
+                background-color: #41981c;
+                color: #fff;
+                text-align: center;
+                padding: 10px;
+            }
+        </style>
     </header>
     <nav>
         <ul>
-            <li><a href="Medicaments/index.html">Home</a></li>
-            <li><a class="command" href="#">Commander</a></li>
-            <li><a href="Login/index.html">Login</a></li>
+            <li><a href="#" id="home-link">Home</a></li>
+            <li><a href="#" id="command-link">Commander</a></li>
+            <li><a href="#" id="login-link">Login</a></li>
         </ul>
-    </nav> 
-    <main>
+    </nav>
+
+    <div class="login-container-outer">
+        <div class="login-container" id="login-container">
+            <h1>Identifiez-vous!</h1>
+            <form onsubmit="return verificarInicioSesion()">
+                <label for="username">Identifiant:</label>
+                <input type="text" id="username" name="user" placeholder="Prenom" required>
+            
+                <label for="password"># de Chambre:</label>
+                <input type="password" id="password" name="password" placeholder="ex: 123">
+            
+                <button type="submit">Ingresar</button>
+            </form>
+        </div>
+    </div>
+
+    <main id="home-content">
         <div class="menu">
             <div class="med">
                 <h2> Doliprane</h2>
-                <!--<img src="../Images/doliprane.jpg" alt="Texto alternativo">-->
+                <img src="doliprane.jpg" alt="doliprane.jpg">
                 <p>Le Doliprane est un médicament à base de paracétamol qui soulage la douleur, comme les maux de tête, et abaisse la fièvre en inhibant les substances chimiques responsables de la douleur et de la fièvre dans le cerveau.</p>
                 <button id="add">Add</button>
             </div>
 
             <div class="med">
                 <h2> Tramadol</h2>
-                <!--<img class="tramadol" src="../Images/tramadol.jpg" alt="Texto alternativo">-->
+                <img class="tramadol" src="tramadol.jpg" alt="tramadol.jpg">
                 <p>Le Tramadol est un médicament analgésique utilisé pour soulager la douleur modérée à sévère. Il agit en modifiant la façon dont le cerveau perçoit la douleur.</p>
                 <button id="add">Add</button>
             </div>
         </div>
     </main>
+
     <footer>
         <p> SansT © 2023 </p>
     </footer>
-</body>
+
+    <script>
+        // Funciones para mostrar/ocultar contenido
+        function mostrarHome() {
+            document.getElementById('home-content').style.display = 'block';
+            document.getElementById('login-container').style.display = 'none';
+        }
+
+        function mostrarLogin() {
+            document.getElementById('home-content').style.display = 'none';
+            document.getElementById('login-container').style.display = 'block';
+        }
+
+        function mostrarAdmin() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'block';
+        }
+
+        // Agregar eventos a los enlaces
+        document.getElementById('home-link').addEventListener('click', mostrarHome);
+        document.getElementById('command-link').addEventListener('click', mostrarHome);
+        document.getElementById('login-link').addEventListener('click', mostrarLogin);
+
+        // Mostrar la vista inicial (Login)
+        mostrarLogin();
+
+        // Definir una estructura de datos para almacenar usuarios
+        var usuarios = [
+            {
+                username: "Mike",
+                password: "123"
+
+            },
+            {
+                username: "999",
+                password: ""
+            }
+        ];
+
+        // Función para verificar el inicio de sesión
+        function verificarInicioSesion() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Verificar si las credenciales coinciden con los usuarios almacenados
+            var usuarioEncontrado = usuarios.find(function(usuario) {
+                return usuario.username === username && usuario.password === password;
+            });
+
+            if (usuarioEncontrado) {
+                if (username === "999") {
+                    mostrarAdmin();
+                }
+                //alert("Inicio de sesión exitoso.");
+                mostrarHome();
+                // Redirigir al usuario a la página principal, realizar otras acciones, etc.
+            } else {
+                alert("Identifiant et mot de passe incorrect");
+            }
+        }
+    </script>
+</body> 
 </html>
