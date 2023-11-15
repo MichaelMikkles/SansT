@@ -156,6 +156,64 @@
                 margin: 5px auto;
             }
 
+            #admin-content {
+                text-align: center;
+                margin: 20px;
+            }
+        
+            #user-list li{
+                list-style-type: none;
+                padding: 3px;
+            }
+        
+            .user-item {
+                border: 1px solid #ccc;
+                margin: 10px;
+                padding: 10px;
+                border-radius: 5px;
+                background-color: #fff;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                display: flex;
+                justify-content: space-evenly;
+                align-items: center;
+            }
+
+            .user-item .reject-button:hover {
+                background-color: #E00000;
+            }        
+        
+            .user-item .accept-button:hover {
+                background-color: #45a049;
+            }
+        
+            .user-item .accept-button {
+                background-color: #4CAF50;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 14px;
+                border-radius: 3px;
+                cursor: pointer;
+                margin-right: 4px;
+                
+            }
+        
+            .user-item .reject-button {
+                background-color: #ff0000; /* Color de fondo para el botón de rechazo */
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                text-align: center;
+                text-decoration: none;
+                display: inline-block;
+                font-size: 14px;
+                border-radius: 3px;
+                cursor: pointer;
+            }
+        
             
 
         </style>
@@ -332,6 +390,7 @@
             usuarios.forEach(function(user) {
                 if(user.username != 999){
                     var listItem = document.createElement('li');
+                    listItem.classList.add('user-item');
                     listItem.textContent = 'Patient: ' + user.username + ' - ';
                 }
         
@@ -351,20 +410,23 @@
                 userList.appendChild(listItem);
                 // Agrega un botón para restablecer los medicamentos de este usuario
                 if (user.password != "") {
-                    var rejectButton = document.createElement('button');
-                    rejectButton.textContent = 'Refuser';
-                    rejectButton.addEventListener('click', function () {
-                        resetMedications(user);
-                    });
-                    var aceptButton = document.createElement('button');
-                    aceptButton.textContent = 'Acepter';
-                    aceptButton.addEventListener('click', function () {
+                    var acceptButton = document.createElement('button');
+                    acceptButton.textContent = 'Accepter';
+                    acceptButton.classList.add('accept-button');
+                    acceptButton.addEventListener('click', function () {
                         alert("Les médicaments ont été envoyés");
                         resetMedications(user);
                     });
-        
+
+                    var rejectButton = document.createElement('button');
+                    rejectButton.textContent = 'Refuser';
+                    rejectButton.classList.add('reject-button');
+                    rejectButton.addEventListener('click', function () {
+                        resetMedications(user);
+                    });
+                    
+                    listItem.appendChild(acceptButton);
                     listItem.appendChild(rejectButton);
-                    listItem.appendChild(aceptButton);
                 }
             });
         }
