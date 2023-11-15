@@ -8,6 +8,7 @@
 <body>
     <header>
         <h1>PharmaBox</h1>
+        <span id="user-welcome"></span>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -22,7 +23,7 @@
                 text-align: center;
                 padding: 20px;
             }
-    
+
             nav ul {
                 list-style: none;
                 padding: 0;
@@ -33,7 +34,7 @@
                 display: inline;
                 margin-right: 20px;
             }
-    
+
             nav a {
                 text-decoration: none;
                 color: #41981c;
@@ -85,8 +86,8 @@
             }
 
             .login-container-outer {
-                max-width: 400px; /* Establece el ancho máximo que desees */
-                margin: 30px auto; /* Centra el contenedor horizontalmente en la página */
+                max-width: 400px; 
+                margin: 30px auto;
             }
             
     
@@ -97,14 +98,14 @@
             #home-content .menu {
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
-                gap: 20px; /* Agrega un espacio entre los contenedores .med */
+                gap: 20px; 
             }
     
             #home-content .med {
                 display: flex;
-                flex-direction: column; /* Apila los elementos verticalmente */
-                align-items: flex-start; /* Alinea los elementos a la izquierda */
-                text-align: left; /* Alinea el texto a la izquierda */
+                flex-direction: column;
+                align-items: flex-start;
+                text-align: left;
             }
     
             #home-content .med h2 {
@@ -122,8 +123,19 @@
             }
     
             #home-content #add {
-                margin: 10px; /* Agrega un espacio entre el párrafo y el botón */
-                align-self: flex-start; /* Alinea el botón a la izquierda */
+                margin: 10px; 
+                align-self: flex-start;
+            }
+
+            .counter {
+                display: inline-block;
+                gap: 10px;
+                margin-left: 10px;
+                background-color: #ffd700; 
+                color: #fff; 
+                border-radius: 5px;
+                margin-top: 5px; 
+                padding: 5px 10px;
             }
 
             footer {
@@ -144,6 +156,7 @@
                 margin: 5px auto;
             }
 
+            
 
         </style>
     </header>
@@ -176,22 +189,33 @@
         </ul>
     </div>
 
+    <div id="command-content">
+        <h1>Medicaments demandes</h1>
+        <ul id="user-medicament-list">
+        </ul>
+    </div>
+
+
     <main id="home-content">
         <div class="menu">
             <div class="med">
                 <h2> Doliprane</h2>
                 <img src="doliprane.jpg" alt="doliprane.jpg">
                 <p>Le Doliprane est un médicament à base de paracétamol qui soulage la douleur, comme les maux de tête, et abaisse la fièvre en inhibant les substances chimiques responsables de la douleur et de la fièvre dans le cerveau.</p>
-                <button id="add-doliprane">Add</button>
-                <span id="counter-doliprane">0</span>
+                <div class="counter">
+                    <button id="add-doliprane">Add</button>
+                    <span id="counter-doliprane">0</span>
+                </div>
             </div>
             
             <div class="med">
                 <h2> Tramadol</h2>
                 <img class="tramadol" src="tramadol.jpg" alt="tramadol.jpg">
                 <p>Le Tramadol est un médicament analgésique utilisé pour soulager la douleur modérée à sévère. Il agit en modifiant la façon dont le cerveau perçoit la douleur.</p>
-                <button id="add-tramadol">Add</button>
-                <span id="counter-tramadol">0</span>
+                <div class="counter">
+                    <button id="add-tramadol">Add</button>
+                    <span id="counter-tramadol">0</span>
+                </div>
             </div>
 
             <div class="buttons">
@@ -205,29 +229,42 @@
         <p> SansT © 2023 </p>
     </footer>
 
+
+
     <script>
         // Funciones para mostrar/ocultar contenido
         function mostrarHome() {
             document.getElementById('home-content').style.display = 'block';
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('admin-content').style.display = 'none';
+            document.getElementById('command-content').style.display = 'none';
         }
 
         function mostrarLogin() {
             document.getElementById('home-content').style.display = 'none';
             document.getElementById('login-container').style.display = 'block';
             document.getElementById('admin-content').style.display = 'none';
+            document.getElementById('command-content').style.display = 'none';
         }
 
         function mostrarAdmin() {
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
             document.getElementById('home-content').style.display = 'none';
+            document.getElementById('command-content').style.display = 'none';
+        }
+
+        function mostrarDemandes(){
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'none';
+            document.getElementById('home-content').style.display = 'none';
+            document.getElementById('command-content').style.display = 'block';
+            listDemandes();
         }
 
         // Agregar eventos a los enlaces
         document.getElementById('home-link').addEventListener('click', mostrarHome);
-        document.getElementById('command-link').addEventListener('click', mostrarHome);
+        document.getElementById('command-link').addEventListener('click', mostrarDemandes);
         document.getElementById('login-link').addEventListener('click', mostrarLogin);
 
         // Mostrar la vista inicial (Login)
@@ -237,8 +274,13 @@
         var usuarios = [
             {
                 username: "Mike",
-                password: "123"
-
+                password: "123",
+                selectedMedications: { doliprane: 0, tramadol: 0 }            
+            },
+            {
+                username: "Alex",
+                password: "123",
+                selectedMedications: { doliprane: 0, tramadol: 0 }            
             },
             {
                 username: "999",
@@ -247,16 +289,18 @@
         ];
 
         // Función para verificar el inicio de sesión
+        var logged = false;
+
         function verificarInicioSesion() {
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
 
             // Verificar si las credenciales coinciden con los usuarios almacenados
-            var usuarioEncontrado = usuarios.find(function(usuario) {
-                return usuario.username === username && usuario.password === password;
+            var findUser = usuarios.find(function(user) {
+                return user.username === username && user.password === password;
             });
 
-            if (usuarioEncontrado) {
+            if (findUser) {
                 if (username === "999") {
                     mostrarAdmin();
                 }
@@ -264,25 +308,69 @@
                     //alert("Inicio de sesión exitoso.");
                     mostrarHome();
                 }
+                logged = true;
+                mostrarNombreUsuario(username);
                 return false;
             } else {
                 alert("Identifiant et mot de passe incorrect");
             }
         }
 
+        function mostrarNombreUsuario(username) {
+            // Muestra el nombre del usuario en el elemento con el id "user-welcome"
+            var userWelcome = document.getElementById('user-welcome');
+            userWelcome.textContent =  "user: " + username;
+        }
+
         function mostrarUsuarios() {
             var userList = document.getElementById('user-list');
-
+            
             // Limpiar la lista de usuarios antes de agregar nuevos usuarios
             userList.innerHTML = '';
-
+            
             // Generar y agregar elementos de lista para cada usuario
-            usuarios.forEach(function(usuario) {
-                var listItem = document.createElement('li');
-                listItem.textContent = 'Patient: ' + usuario.username + ', mot de passe: ' + usuario.password;
+            usuarios.forEach(function(user) {
+                if(user.username != 999){
+                    var listItem = document.createElement('li');
+                    listItem.textContent = 'Patient: ' + user.username + ' - ';
+                }
+        
+                // Verifica si el usuario tiene medicamentos solicitados
+                if (user.selectedMedications) {
+                    listItem.textContent += '\nMedicaments commandés:';
+        
+                    // Agrega los medicamentos solicitados a la lista
+                    if (user.selectedMedications.doliprane > 0) {
+                        listItem.textContent += '\n- Doliprane: ' + user.selectedMedications.doliprane;
+                    }
+                    if (user.selectedMedications.tramadol > 0) {
+                        listItem.textContent += '\n- Tramadol: ' + user.selectedMedications.tramadol;
+                    }
+                }
+        
                 userList.appendChild(listItem);
+                // Agrega un botón para restablecer los medicamentos de este usuario
+                if (user.password != "") {
+                    var rejectButton = document.createElement('button');
+                    rejectButton.textContent = 'Refuser';
+                    rejectButton.addEventListener('click', function () {
+                        resetMedications(user);
+                    });
+                    var aceptButton = document.createElement('button');
+                    aceptButton.textContent = 'Acepter';
+                    aceptButton.addEventListener('click', function () {
+                        alert("Les médicaments ont été envoyés");
+                        resetMedications(user);
+                    });
+        
+                    listItem.appendChild(rejectButton);
+                    listItem.appendChild(aceptButton);
+                }
             });
         }
+        
+               
+        
 
         // Llama a la función para mostrar la lista de usuarios cuando la página se cargue
         window.addEventListener('load', mostrarUsuarios);
@@ -307,24 +395,90 @@
             document.getElementById('counter-doliprane').textContent = counterDoliprane;
             document.getElementById('counter-tramadol').textContent = counterTramadol;
         });
+        // Agrega este código al final de tu script
+    
+
+
+        // Función para mostrar los medicamentos pedidos
+        function listDemandes() {
+            if (logged) {
+                // Obtén el usuario actual
+                var usuarioActual = usuarios.find(function(user) {
+                    return user.username === document.getElementById('username').value;
+                });
+        
+                if (usuarioActual) {
+                    // Obtén la lista de medicamentos pedidos del usuario
+                    var medicamentosPedidos = usuarioActual.selectedMedications;
+        
+                    // Obtén el contenedor donde mostrarás los medicamentos pedidos (reemplaza 'user-medicament-list' con el ID real)
+                    var containerDemandes = document.getElementById('user-medicament-list');
+        
+                    // Limpia el contenedor antes de agregar nuevos elementos
+                    containerDemandes.innerHTML = '';
+        
+                    // Recorre los medicamentos pedidos y crea elementos para mostrarlos
+                    for (var medicamento in medicamentosPedidos) {
+                        if (medicamentosPedidos.hasOwnProperty(medicamento)) {
+                            var cantidad = medicamentosPedidos[medicamento];
+        
+                            // Crea un elemento de lista
+                            var listItem = document.createElement('li');
+                            listItem.textContent = 'Medicamento: ' + medicamento + ', Cantidad: ' + cantidad;
+        
+                            // Agrega el elemento de lista al contenedor
+                            containerDemandes.appendChild(listItem);
+                        }
+                    }
+        
+                    // Muestra la ventana de demandes (reemplaza 'demandes-container' con el ID real)
+                    document.getElementById('command-content').style.display = 'block';
+                } else {
+                    alert('Usuario no encontrado');
+                }
+            } else {
+                alert('Debes iniciar sesión para ver tus demandes.');
+            }
+        }
+        
+        function resetMedications(user) {
+            // Restablecer medicamentos para el usuario dado
+            user.selectedMedications = { doliprane: 0, tramadol: 0 };
+            // Volver a mostrar la lista de usuarios después del restablecimiento
+            mostrarUsuarios();
+        }
+        
+        
+
 
         document.querySelector('.commander').addEventListener('click', function() {
-            var cantidadDoliprane = counterDoliprane;
-            var cantidadTramadol = counterTramadol;
+            var quantityDoliprane = counterDoliprane;
+            var quantityTramadol = counterTramadol;
+
+            var usuarioActual = usuarios.find(function(user) {
+                return user.username === document.getElementById('username').value;
+            });
         
-            var mensaje = "Vous avez commandé:\n";
-            if (cantidadDoliprane > 0) {
-                mensaje += cantidadDoliprane + " Doliprane\n";
+            var message = "Vous avez commandé:\n";
+            if (quantityDoliprane > 0) {
+                message += quantityDoliprane + " Doliprane\n";
             }
-            if (cantidadTramadol > 0) {
-                mensaje += cantidadTramadol + " Tramadol\n";
-            }
-        
-            if (cantidadDoliprane === 0 && cantidadTramadol === 0) {
-                mensaje = "Aucun médicament sélectionné.";
+            if (quantityTramadol > 0) {
+                message += quantityTramadol + " Tramadol\n";
             }
         
-            alert(mensaje);
+            if (quantityDoliprane === 0 && quantityTramadol === 0) {
+                message = "Aucun médicament sélectionné.";
+            }
+            usuarioActual.selectedMedications.doliprane += counterDoliprane;
+            usuarioActual.selectedMedications.tramadol += counterTramadol;
+            counterDoliprane = 0;
+            counterTramadol = 0;
+            document.getElementById('counter-doliprane').textContent = counterDoliprane;
+            document.getElementById('counter-tramadol').textContent = counterTramadol;
+        
+            alert(message);
+            mostrarUsuarios();
         });
     </script>
 </body> 
