@@ -9,6 +9,7 @@
     <header>
         <h1>PharmaBox</h1>
         <span id="user-welcome"></span>
+        <button id="logout-button" onclick="deconnecter()">Déconnecter</button>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -89,8 +90,7 @@
                 max-width: 400px; 
                 margin: 30px auto;
             }
-            
-    
+                
             #home-content {
                 display: none; /* Por defecto oculto */
             }
@@ -139,6 +139,10 @@
             }
 
             footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
                 background-color: #41981c;
                 color: #fff;
                 text-align: center;
@@ -214,6 +218,20 @@
                 cursor: pointer;
             }
         
+            #logout-button {
+                display: none;
+                border: none;
+                background-color: #ffd700;
+                color: white;
+                text-decoration: none;
+                float: right;
+                border-radius: 5px;
+            }
+
+            #logout-button:hover {
+                text-decoration: underline;
+                cursor: pointer;
+            }
             
 
         </style>
@@ -290,29 +308,29 @@
 
 
     <script>
-        // Funciones para mostrar/ocultar contenido
-        function mostrarHome() {
+        // Funciones para show/ocultar contenido
+        function showHome() {
             document.getElementById('home-content').style.display = 'block';
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('admin-content').style.display = 'none';
             document.getElementById('command-content').style.display = 'none';
         }
 
-        function mostrarLogin() {
+        function showLogin() {
             document.getElementById('home-content').style.display = 'none';
             document.getElementById('login-container').style.display = 'block';
             document.getElementById('admin-content').style.display = 'none';
             document.getElementById('command-content').style.display = 'none';
         }
 
-        function mostrarAdmin() {
+        function showAdmin() {
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('admin-content').style.display = 'block';
             document.getElementById('home-content').style.display = 'none';
             document.getElementById('command-content').style.display = 'none';
         }
 
-        function mostrarDemandes(){
+        function showDemandes(){
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('admin-content').style.display = 'none';
             document.getElementById('home-content').style.display = 'none';
@@ -321,12 +339,12 @@
         }
 
         // Agregar eventos a los enlaces
-        document.getElementById('home-link').addEventListener('click', mostrarHome);
-        document.getElementById('command-link').addEventListener('click', mostrarDemandes);
-        document.getElementById('login-link').addEventListener('click', mostrarLogin);
+        document.getElementById('home-link').addEventListener('click', showHome);
+        document.getElementById('command-link').addEventListener('click', showDemandes);
+        document.getElementById('login-link').addEventListener('click', showLogin);
 
         // Mostrar la vista inicial (Login)
-        mostrarLogin();
+        showLogin();
 
         // Definir una estructura de datos para almacenar usuarios
         var usuarios = [
@@ -360,27 +378,28 @@
 
             if (findUser) {
                 if (username === "999") {
-                    mostrarAdmin();
+                    showAdmin();
                 }
                 else{
                     //alert("Inicio de sesión exitoso.");
-                    mostrarHome();
+                    showHome();
                 }
                 logged = true;
-                mostrarNombreUsuario(username);
+                document.getElementById('logout-button').style.display = 'revert';
+                showNombreUsuario(username);
                 return false;
             } else {
                 alert("Identifiant et mot de passe incorrect");
             }
         }
 
-        function mostrarNombreUsuario(username) {
+        function showNombreUsuario(username) {
             // Muestra el nombre del usuario en el elemento con el id "user-welcome"
             var userWelcome = document.getElementById('user-welcome');
-            userWelcome.textContent =  "user: " + username;
+            userWelcome.textContent =  "Identifiant: " + username;
         }
 
-        function mostrarUsuarios() {
+        function showUsuarios() {
             var userList = document.getElementById('user-list');
             
             // Limpiar la lista de usuarios antes de agregar nuevos usuarios
@@ -431,11 +450,27 @@
             });
         }
         
+        function deconnecter() {
+            // Restablece el estado de la aplicación para show la vista de inicio de sesión
+            showLogin();
+        
+            // También podrías restablecer cualquier otra información relacionada con la sesión
+            // como reiniciar contadores, ocultar información del usuario actual, etc.
+        
+            // Restablece la variable de sesión
+            logged = false;
+            document.getElementById('logout-button').style.display = 'none';
+        
+            // Limpia el nombre del usuario en el encabezado
+            document.getElementById('user-welcome').textContent = '';
+        
+            // Puedes añadir más acciones de reinicio según sea necesario
+        }
                
         
 
-        // Llama a la función para mostrar la lista de usuarios cuando la página se cargue
-        window.addEventListener('load', mostrarUsuarios);
+        // Llama a la función para show la lista de usuarios cuando la página se cargue
+        window.addEventListener('load', showUsuarios);
 
         // Agrega contadores y manejo de botones
         var counterDoliprane = 0;
@@ -461,7 +496,7 @@
     
 
 
-        // Función para mostrar los medicamentos pedidos
+        // Función para show los medicamentos pedidos
         function listDemandes() {
             if (logged) {
                 // Obtén el usuario actual
@@ -473,13 +508,13 @@
                     // Obtén la lista de medicamentos pedidos del usuario
                     var medicamentosPedidos = usuarioActual.selectedMedications;
         
-                    // Obtén el contenedor donde mostrarás los medicamentos pedidos (reemplaza 'user-medicament-list' con el ID real)
+                    // Obtén el contenedor donde showás los medicamentos pedidos (reemplaza 'user-medicament-list' con el ID real)
                     var containerDemandes = document.getElementById('user-medicament-list');
         
                     // Limpia el contenedor antes de agregar nuevos elementos
                     containerDemandes.innerHTML = '';
         
-                    // Recorre los medicamentos pedidos y crea elementos para mostrarlos
+                    // Recorre los medicamentos pedidos y crea elementos para showlos
                     for (var medicamento in medicamentosPedidos) {
                         if (medicamentosPedidos.hasOwnProperty(medicamento)) {
                             var cantidad = medicamentosPedidos[medicamento];
@@ -506,8 +541,8 @@
         function resetMedications(user) {
             // Restablecer medicamentos para el usuario dado
             user.selectedMedications = { doliprane: 0, tramadol: 0 };
-            // Volver a mostrar la lista de usuarios después del restablecimiento
-            mostrarUsuarios();
+            // Volver a show la lista de usuarios después del restablecimiento
+            showUsuarios();
         }
         
         
@@ -540,7 +575,7 @@
             document.getElementById('counter-tramadol').textContent = counterTramadol;
         
             alert(message);
-            mostrarUsuarios();
+            showUsuarios();
         });
     </script>
 </body> 
