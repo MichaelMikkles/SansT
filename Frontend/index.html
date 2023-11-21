@@ -27,7 +27,6 @@
 
             nav ul {
                 list-style: none;
-                padding: 0;
                 text-align: center;
             }
     
@@ -99,6 +98,7 @@
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
                 gap: 20px; 
+                margin: 20px;
             }
     
             #home-content .med {
@@ -106,6 +106,7 @@
                 flex-direction: column;
                 align-items: flex-start;
                 text-align: left;
+                background: white;
             }
     
             #home-content .med h2 {
@@ -139,10 +140,6 @@
             }
 
             footer {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                width: 100%;
                 background-color: #41981c;
                 color: #fff;
                 text-align: center;
@@ -240,7 +237,6 @@
         <ul>
             <li><a href="#" id="home-link">Home</a></li>
             <li><a href="#" id="command-link">Mes demandes</a></li>
-            <li><a href="#" id="login-link">Login</a></li>
         </ul>
     </nav>
 
@@ -328,6 +324,8 @@
             document.getElementById('admin-content').style.display = 'block';
             document.getElementById('home-content').style.display = 'none';
             document.getElementById('command-content').style.display = 'none';
+            var linkMenu = document.getElementById('home-link');
+            linkMenu.textContent = 'Mes patients';
         }
 
         function showDemandes(){
@@ -339,9 +337,8 @@
         }
 
         // Agregar eventos a los enlaces
-        document.getElementById('home-link').addEventListener('click', showHome);
+        document.getElementById('home-link').addEventListener('click', isAdmin ? showAdmin : showHome);
         document.getElementById('command-link').addEventListener('click', showDemandes);
-        document.getElementById('login-link').addEventListener('click', showLogin);
 
         // Mostrar la vista inicial (Login)
         showLogin();
@@ -367,6 +364,14 @@
         // Función para verificar el inicio de sesión
         var logged = false;
 
+        // Funcion para verificar si el usuario es admin
+        var isAdmin = false;
+
+        // Agrega contadores y manejo de botones
+        var counterDoliprane = 0;
+        var counterTramadol = 0;
+
+
         function verificarInicioSesion() {
             var username = document.getElementById('username').value;
             var password = document.getElementById('password').value;
@@ -378,10 +383,10 @@
 
             if (findUser) {
                 if (username === "999") {
+                    isAdmin = true;
                     showAdmin();
                 }
                 else{
-                    //alert("Inicio de sesión exitoso.");
                     showHome();
                 }
                 logged = true;
@@ -449,6 +454,7 @@
                 }
             });
         }
+
         
         function deconnecter() {
             // Restablece el estado de la aplicación para show la vista de inicio de sesión
@@ -464,18 +470,15 @@
             // Limpia el nombre del usuario en el encabezado
             document.getElementById('user-welcome').textContent = '';
         
-            // Puedes añadir más acciones de reinicio según sea necesario
+            var linkMenu = document.getElementById('home-link');
+            linkMenu.textContent = 'Home';
         }
                
-        
-
+    
         // Llama a la función para show la lista de usuarios cuando la página se cargue
         window.addEventListener('load', showUsuarios);
 
-        // Agrega contadores y manejo de botones
-        var counterDoliprane = 0;
-        var counterTramadol = 0;
-
+        
         document.getElementById('add-doliprane').addEventListener('click', function() {
             counterDoliprane++;
             document.getElementById('counter-doliprane').textContent = counterDoliprane;
@@ -506,7 +509,7 @@
         
                 if (usuarioActual) {
                     // Obtén la lista de medicamentos pedidos del usuario
-                    var medicamentosPedidos = usuarioActual.selectedMedications;
+                    var medicamentDemande = usuarioActual.selectedMedications;
         
                     // Obtén el contenedor donde showás los medicamentos pedidos (reemplaza 'user-medicament-list' con el ID real)
                     var containerDemandes = document.getElementById('user-medicament-list');
@@ -515,13 +518,13 @@
                     containerDemandes.innerHTML = '';
         
                     // Recorre los medicamentos pedidos y crea elementos para showlos
-                    for (var medicamento in medicamentosPedidos) {
-                        if (medicamentosPedidos.hasOwnProperty(medicamento)) {
-                            var cantidad = medicamentosPedidos[medicamento];
+                    for (var medicament in medicamentDemande) {
+                        if (medicamentDemande.hasOwnProperty(medicament)) {
+                            var cantidad = medicamentDemande[medicament];
         
                             // Crea un elemento de lista
                             var listItem = document.createElement('li');
-                            listItem.textContent = 'Medicamento: ' + medicamento + ', Cantidad: ' + cantidad;
+                            listItem.textContent = 'Medicament: ' + medicament + ', Quantite: ' + cantidad;
         
                             // Agrega el elemento de lista al contenedor
                             containerDemandes.appendChild(listItem);
@@ -531,10 +534,10 @@
                     // Muestra la ventana de demandes (reemplaza 'demandes-container' con el ID real)
                     document.getElementById('command-content').style.display = 'block';
                 } else {
-                    alert('Usuario no encontrado');
+                    alert('User n\'etait pas trouvé');
                 }
             } else {
-                alert('Debes iniciar sesión para ver tus demandes.');
+                alert('Indetifiez vous pour voir vos demandes.');
             }
         }
         
@@ -544,9 +547,6 @@
             // Volver a show la lista de usuarios después del restablecimiento
             showUsuarios();
         }
-        
-        
-
 
         document.querySelector('.commander').addEventListener('click', function() {
             var quantityDoliprane = counterDoliprane;
