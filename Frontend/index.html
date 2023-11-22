@@ -128,6 +128,10 @@
                 align-self: flex-start;
             }
 
+            #user-welcome {
+                margin-left: 75px;
+            }
+
             .counter {
                 display: inline-block;
                 gap: 10px;
@@ -229,6 +233,28 @@
                 text-decoration: underline;
                 cursor: pointer;
             }
+
+            #command-content {
+                text-align: center;
+                margin: 20px;
+            }
+            
+            #user-medicament-list {
+                list-style-type: none;
+                padding: 0;
+            }
+            
+            #user-medicament-list li {
+                border: 1px solid #ccc;
+                margin: 10px;
+                padding: 10px;
+                border-radius: 5px;
+                background-color: #fff;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
             
 
         </style>
@@ -256,7 +282,7 @@
     </div>
 
     <div id="admin-content">
-        <h1>Patients</h1>
+        <h1>Commandes de Patients</h1>
         <ul id="user-list">
         </ul>
     </div>
@@ -267,6 +293,18 @@
         </ul>
     </div>
 
+    <div id="patient-content">
+        <h1>Patients</h1>
+        <ul id="patient-list">
+        </ul>
+    </div>
+
+    <div id="user-medication">
+        <h2>Medicaments commandés</h2>
+        <ul id="medication-list"></ul>
+    </div>
+    
+
 
     <main id="home-content">
         <div class="menu">
@@ -275,7 +313,7 @@
                 <img src="doliprane.jpg" alt="doliprane.jpg">
                 <p>Le Doliprane est un médicament à base de paracétamol qui soulage la douleur, comme les maux de tête, et abaisse la fièvre en inhibant les substances chimiques responsables de la douleur et de la fièvre dans le cerveau.</p>
                 <div class="counter">
-                    <button id="add-doliprane">Add</button>
+                    <button class="adder" id="add-doliprane">Add</button>
                     <span id="counter-doliprane">0</span>
                 </div>
             </div>
@@ -285,13 +323,13 @@
                 <img class="tramadol" src="tramadol.jpg" alt="tramadol.jpg">
                 <p>Le Tramadol est un médicament analgésique utilisé pour soulager la douleur modérée à sévère. Il agit en modifiant la façon dont le cerveau perçoit la douleur.</p>
                 <div class="counter">
-                    <button id="add-tramadol">Add</button>
+                    <button class="adder" id="add-tramadol">Add</button>
                     <span id="counter-tramadol">0</span>
                 </div>
             </div>
 
             <div class="buttons">
-                <button id="reset-counters">Reinitializer</button>
+                <button id="reset-counters" class="reseter">Reinitializer</button>
                 <button id="reset-counters" class="commander">Commander</button>
             </div>
         </div>
@@ -310,6 +348,9 @@
             document.getElementById('login-container').style.display = 'none';
             document.getElementById('admin-content').style.display = 'none';
             document.getElementById('command-content').style.display = 'none';
+            document.getElementById('patient-content').style.display = 'none';
+            document.getElementById('user-medication').style.display = 'none';
+            actualizarEstadoBotones();
         }
 
         function showLogin() {
@@ -317,6 +358,8 @@
             document.getElementById('login-container').style.display = 'block';
             document.getElementById('admin-content').style.display = 'none';
             document.getElementById('command-content').style.display = 'none';
+            document.getElementById('patient-content').style.display = 'none';
+            document.getElementById('user-medication').style.display = 'none';
         }
 
         function showAdmin() {
@@ -324,6 +367,8 @@
             document.getElementById('admin-content').style.display = 'block';
             document.getElementById('home-content').style.display = 'none';
             document.getElementById('command-content').style.display = 'none';
+            document.getElementById('patient-content').style.display = 'none';
+            document.getElementById('user-medication').style.display = 'none';
             var linkMenu = document.getElementById('home-link');
             linkMenu.textContent = 'Mes patients';
         }
@@ -333,12 +378,39 @@
             document.getElementById('admin-content').style.display = 'none';
             document.getElementById('home-content').style.display = 'none';
             document.getElementById('command-content').style.display = 'block';
+            document.getElementById('patient-content').style.display = 'none';
+            document.getElementById('user-medication').style.display = 'none';
             listDemandes();
         }
 
+        function showPatients(){
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('admin-content').style.display = 'none';
+            document.getElementById('home-content').style.display = 'none';
+            document.getElementById('command-content').style.display = 'none';
+            document.getElementById('patient-content').style.display = 'block';
+            document.getElementById('user-medication').style.display = 'none';
+            showAllPatients();
+        }
+
         // Agregar eventos a los enlaces
-        document.getElementById('home-link').addEventListener('click', isAdmin ? showAdmin : showHome);
-        document.getElementById('command-link').addEventListener('click', showDemandes);
+        document.getElementById('home-link').addEventListener('click', function () {
+            if (isAdmin) {
+                showAdmin();
+            } else {
+                showHome();
+            }
+        });
+
+        document.getElementById('command-link').addEventListener('click', function () {
+            console.log(isAdmin);
+            if (isAdmin) {
+                showPatients();
+            } else {
+                showDemandes();
+            }
+        });
+        
 
         // Mostrar la vista inicial (Login)
         showLogin();
@@ -371,6 +443,8 @@
         var counterDoliprane = 0;
         var counterTramadol = 0;
 
+        document.getElementById('home-link').style.display = 'none';
+        document.getElementById('command-link').style.display = 'none';
 
         function verificarInicioSesion() {
             var username = document.getElementById('username').value;
@@ -391,6 +465,9 @@
                 }
                 logged = true;
                 document.getElementById('logout-button').style.display = 'revert';
+                actualizarEstadoBotones();
+                document.getElementById('home-link').style.display = 'inline';
+                document.getElementById('command-link').style.display = 'inline';
                 showNombreUsuario(username);
                 return false;
             } else {
@@ -455,6 +532,52 @@
             });
         }
 
+        function showAllPatients() {
+            var userList = document.getElementById('patient-list');
+            
+            // Limpiar la lista de usuarios antes de agregar nuevos usuarios
+            userList.innerHTML = '';
+
+            usuarios.forEach(function(user) {
+                if (user.username !== 999) {
+                    var listItem = document.createElement('li');
+                    listItem.classList.add('patient-item');
+                    listItem.textContent = 'Patient: ' + user.username;
+
+                    // Agrega evento de clic al usuario
+                    listItem.addEventListener('click', function() {
+                        mostrarMedicamentos(user);
+                    });
+
+                    userList.appendChild(listItem);
+                }
+            });
+        }
+
+        // Función para mostrar los medicamentos del usuario
+        function mostrarMedicamentos(user) {
+            // Obtén el contenedor de la lista de medicamentos
+            var medicationListContainer = document.getElementById('medication-list');
+            
+            // Limpia el contenido anterior
+            medicationListContainer.innerHTML = '';
+
+            // Crea y agrega elementos de lista para cada medicamento
+            for (var medicament in user.selectedMedications) {
+                if (user.selectedMedications.hasOwnProperty(medicament)) {
+                    var cantidad = user.selectedMedications[medicament];
+
+                    var listItem = document.createElement('li');
+                    listItem.textContent = medicament + ': ' + cantidad;
+
+                    medicationListContainer.appendChild(listItem);
+                }
+            }
+
+            // Muestra la vista de medicamentos
+            document.getElementById('user-medication').style.display = 'block';
+        }
+
         
         function deconnecter() {
             // Restablece el estado de la aplicación para show la vista de inicio de sesión
@@ -465,8 +588,10 @@
         
             // Restablece la variable de sesión
             logged = false;
+            isAdmin = false;
             document.getElementById('logout-button').style.display = 'none';
-        
+            document.getElementById('home-link').style.display = 'none';
+            document.getElementById('command-link').style.display = 'none';
             // Limpia el nombre del usuario en el encabezado
             document.getElementById('user-welcome').textContent = '';
         
@@ -546,6 +671,16 @@
             user.selectedMedications = { doliprane: 0, tramadol: 0 };
             // Volver a show la lista de usuarios después del restablecimiento
             showUsuarios();
+        }
+
+        function actualizarEstadoBotones() {
+            // Obtén todos los botones que deseas desactivar
+            var botones = document.querySelectorAll('.accept-button, .reject-button, .commander, .adder, .reseter');
+        
+            // Itera sobre los botones y establece su estado según la variable logged
+            botones.forEach(function (boton) {
+                boton.disabled = !logged;
+            });
         }
 
         document.querySelector('.commander').addEventListener('click', function() {
