@@ -293,12 +293,14 @@
         </ul>
     </div>
 
+    <!--Admin patient list-->
     <div id="patient-content">
         <h1>Patients</h1>
         <ul id="patient-list">
         </ul>
     </div>
 
+    <!--Admin patient medicaments comandes-->
     <div id="user-medication">
         <h2>Medicaments commandés</h2>
         <ul id="medication-list"></ul>
@@ -370,6 +372,8 @@
             document.getElementById('patient-content').style.display = 'none';
             document.getElementById('user-medication').style.display = 'none';
             var linkMenu = document.getElementById('home-link');
+            linkMenu.textContent = 'Mes demandes';
+            var linkMenu = document.getElementById('command-link');
             linkMenu.textContent = 'Mes patients';
         }
 
@@ -420,12 +424,12 @@
             {
                 username: "Mike",
                 password: "123",
-                selectedMedications: { doliprane: 0, tramadol: 0 }            
+                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" } ]
             },
             {
                 username: "Alex",
                 password: "123",
-                selectedMedications: { doliprane: 0, tramadol: 0 }            
+                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" } ]
             },
             {
                 username: "999",
@@ -496,15 +500,15 @@
                 }
         
                 // Verifica si el usuario tiene medicamentos solicitados
-                if (user.selectedMedications) {
+                if (user.orders[0].medicaments) {
                     listItem.textContent += '\nMedicaments commandés:';
         
                     // Agrega los medicamentos solicitados a la lista
-                    if (user.selectedMedications.doliprane > 0) {
-                        listItem.textContent += '\n- Doliprane: ' + user.selectedMedications.doliprane;
+                    if (user.orders[0].medicaments.doliprane > 0) {
+                        listItem.textContent += '\n- Doliprane: ' + user.orders[0].medicaments.doliprane;
                     }
-                    if (user.selectedMedications.tramadol > 0) {
-                        listItem.textContent += '\n- Tramadol: ' + user.selectedMedications.tramadol;
+                    if (user.orders[0].medicaments.tramadol > 0) {
+                        listItem.textContent += '\n- Tramadol: ' + user.orders[0].medicaments.tramadol;
                     }
                 }
         
@@ -515,44 +519,111 @@
                     acceptButton.textContent = 'Accepter';
                     acceptButton.classList.add('accept-button');
                     acceptButton.addEventListener('click', function () {
-                        alert("Les médicaments ont été envoyés");
-                        resetMedications(user);
+                        // Crear una nueva orden y colocarla al principio de la lista
+                        var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" };
+                        user.orders.unshift(newOrder);
+                        
+                        // Cambiar el estado de la orden actual a "accepted"
+                        user.orders[1].status = "accepted";
+                        
+                        
+                        alert("Les médicaments ont été acceptés");
+                        
+                        // Actualizar la vista de usuarios
+                        showUsuarios();
                     });
-
+                
                     var rejectButton = document.createElement('button');
                     rejectButton.textContent = 'Refuser';
                     rejectButton.classList.add('reject-button');
                     rejectButton.addEventListener('click', function () {
-                        resetMedications(user);
+                        // Crear una nueva orden y colocarla al principio de la lista
+                        var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" };
+                        user.orders.unshift(newOrder);
+                        
+                        // Cambiar el estado de la orden actual a "rejected"
+                        user.orders[1].status = "rejected";
+                        
+                        alert("Les médicaments ont été refusés");
+                        
+                        // Actualizar la vista de usuarios
+                        showUsuarios();
                     });
-                    
+                
                     listItem.appendChild(acceptButton);
                     listItem.appendChild(rejectButton);
-                }
+                }                
             });
         }
 
         function showAllPatients() {
             var userList = document.getElementById('patient-list');
-            
+        
             // Limpiar la lista de usuarios antes de agregar nuevos usuarios
             userList.innerHTML = '';
-
+        
             usuarios.forEach(function(user) {
                 if (user.username !== 999) {
                     var listItem = document.createElement('li');
                     listItem.classList.add('patient-item');
                     listItem.textContent = 'Patient: ' + user.username;
-
+        
                     // Agrega evento de clic al usuario
                     listItem.addEventListener('click', function() {
-                        mostrarMedicamentos(user);
+                        showMedicament(user, listItem);
                     });
-
+        
                     userList.appendChild(listItem);
                 }
             });
         }
+        
+        function showMedicament(user, listItem) {
+            // Crear la tabla
+            var table = document.createElement('table');
+            var thead = document.createElement('thead');
+            var tbody = document.createElement('tbody');
+        
+            // Crear la fila de encabezado
+            var headerRow = document.createElement('tr');
+            var headers = ['Commande N°', 'Doliprane', 'Tramadol', 'Status'];
+            headers.forEach(function(headerText) {
+                var header = document.createElement('th');
+                header.textContent = headerText;
+                headerRow.appendChild(header);
+            });
+            thead.appendChild(headerRow);
+        
+            // Crear fila de datos
+            var dataRow = document.createElement('tr');
+            var orderNumber = user.order[0].id; // Número de la orden
+            var medications = user.orders[0].medicaments;
+            var status = user.orders[0].status;
+        
+            var dataCells = [
+                orderNumber,
+                medications.doliprane,
+                medications.tramadol,
+                status
+            ];
+        
+            dataCells.forEach(function(cellText) {
+                var cell = document.createElement('td');
+                cell.textContent = cellText;
+                dataRow.appendChild(cell);
+            });
+            tbody.appendChild(dataRow);
+        
+            // Agregar las partes de la tabla
+            table.appendChild(thead);
+            table.appendChild(tbody);
+        
+            // Reemplazar el contenido del listItem con la tabla
+            listItem.innerHTML = '';
+            listItem.appendChild(table);
+        }
+        
+        
 
         // Función para mostrar los medicamentos del usuario
         function mostrarMedicamentos(user) {
@@ -563,9 +634,9 @@
             medicationListContainer.innerHTML = '';
 
             // Crea y agrega elementos de lista para cada medicamento
-            for (var medicament in user.selectedMedications) {
-                if (user.selectedMedications.hasOwnProperty(medicament)) {
-                    var cantidad = user.selectedMedications[medicament];
+            for (var medicament in user.orders[0].medicaments) {
+                if (user.orders[0].medicaments.hasOwnProperty(medicament)) {
+                    var cantidad = user.orders[0].medicaments[medicament];
 
                     var listItem = document.createElement('li');
                     listItem.textContent = medicament + ': ' + cantidad;
@@ -597,6 +668,8 @@
         
             var linkMenu = document.getElementById('home-link');
             linkMenu.textContent = 'Home';
+            var linkMenu = document.getElementById('command-link');
+            linkMenu.textContent = 'Mes demandes';
         }
                
     
@@ -619,9 +692,7 @@
             counterTramadol = 0;
             document.getElementById('counter-doliprane').textContent = counterDoliprane;
             document.getElementById('counter-tramadol').textContent = counterTramadol;
-        });
-        // Agrega este código al final de tu script
-    
+        });    
 
 
         // Función para show los medicamentos pedidos
@@ -634,7 +705,7 @@
         
                 if (usuarioActual) {
                     // Obtén la lista de medicamentos pedidos del usuario
-                    var medicamentDemande = usuarioActual.selectedMedications;
+                    var medicamentDemande = usuarioActual.orders[0].medicaments;
         
                     // Obtén el contenedor donde showás los medicamentos pedidos (reemplaza 'user-medicament-list' con el ID real)
                     var containerDemandes = document.getElementById('user-medicament-list');
@@ -668,7 +739,7 @@
         
         function resetMedications(user) {
             // Restablecer medicamentos para el usuario dado
-            user.selectedMedications = { doliprane: 0, tramadol: 0 };
+            user.orders[0].medicaments = { doliprane: 0, tramadol: 0 };
             // Volver a show la lista de usuarios después del restablecimiento
             showUsuarios();
         }
@@ -702,8 +773,8 @@
             if (quantityDoliprane === 0 && quantityTramadol === 0) {
                 message = "Aucun médicament sélectionné.";
             }
-            usuarioActual.selectedMedications.doliprane += counterDoliprane;
-            usuarioActual.selectedMedications.tramadol += counterTramadol;
+            usuarioActual.orders[0].medicaments.doliprane += counterDoliprane;
+            usuarioActual.orders[0].medicaments.tramadol += counterTramadol;
             counterDoliprane = 0;
             counterTramadol = 0;
             document.getElementById('counter-doliprane').textContent = counterDoliprane;
