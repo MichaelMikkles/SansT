@@ -129,7 +129,11 @@
             }
 
             #user-welcome {
-                margin-left: 75px;
+                text                
+            }
+
+            #user-welcome .numChambre {
+                margin-left: 83px;
             }
 
             .counter {
@@ -273,7 +277,7 @@
                 <label for="username">Identifiant:</label>
                 <input type="text" id="username" name="user" placeholder="Prenom" required>
             
-                <label for="password"># de Chambre:</label>
+                <label for="password">Mot de passe:</label>
                 <input type="password" id="password" name="password" placeholder="ex: 123">
             
                 <button type="submit">Se connecter</button>
@@ -407,7 +411,6 @@
         });
 
         document.getElementById('command-link').addEventListener('click', function () {
-            console.log(isAdmin);
             if (isAdmin) {
                 showPatients();
             } else {
@@ -424,16 +427,18 @@
             {
                 username: "Mike",
                 password: "123",
-                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" } ]
+                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" } ],
+                nRoom: "1"
             },
             {
                 username: "Alex",
                 password: "123",
-                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" } ]
+                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" } ],
+                nRoom: "2"
             },
             {
                 username: "999",
-                password: ""
+                password: "123"
             }
         ];
 
@@ -459,6 +464,8 @@
                 return user.username === username && user.password === password;
             });
 
+    
+
             if (findUser) {
                 if (username === "999") {
                     isAdmin = true;
@@ -482,8 +489,33 @@
         function showNombreUsuario(username) {
             // Muestra el nombre del usuario en el elemento con el id "user-welcome"
             var userWelcome = document.getElementById('user-welcome');
-            userWelcome.textContent =  "Identifiant: " + username;
+            var currentUser = usuarios.find(function (user) {
+                return user.username === username;
+            });
+        
+            // Crea un nuevo elemento span para cada línea
+            var span1 = document.createElement('span');
+            var span2 = document.createElement('span');
+            span2.classList.add("numChambre");
+
+            span1.style.fontWeight = 'bold';
+            span2.style.fontWeight = 'bold';
+        
+            // Asigna el contenido de cada span
+            span1.textContent = "Identifiant: " + username;
+            if(username !== "999"){
+                span2.textContent = "# de chambre: " + currentUser.nRoom;
+            }
+            else{
+                span2.textContent = "Infirmier"
+            }
+            // Agrega los spans al contenedor
+            userWelcome.innerHTML = '';
+            userWelcome.appendChild(span1);
+            userWelcome.appendChild(document.createElement('br')); // Agrega un salto de línea
+            userWelcome.appendChild(span2);
         }
+        
 
         function showUsuarios() {
             var userList = document.getElementById('user-list');
@@ -500,7 +532,7 @@
                 }
         
                 // Verifica si el usuario tiene medicamentos solicitados
-                if (user.orders[0].medicaments) {
+                else if (user.orders && user.orders.length > 0) {
                     listItem.textContent += '\nMedicaments commandés:';
         
                     // Agrega los medicamentos solicitados a la lista
@@ -514,7 +546,7 @@
         
                 userList.appendChild(listItem);
                 // Agrega un botón para restablecer los medicamentos de este usuario
-                if (user.password != "") {
+                if (user.username == "999") {
                     var acceptButton = document.createElement('button');
                     acceptButton.textContent = 'Accepter';
                     acceptButton.classList.add('accept-button');
