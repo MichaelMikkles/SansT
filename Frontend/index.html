@@ -429,7 +429,11 @@
             document.getElementById('command-content').style.display = 'block';
             document.getElementById('patient-content').style.display = 'none';
             document.getElementById('user-medication').style.display = 'none';
-            listDemandes();
+            var currentUser = usuarios.find(function (user) {
+                return user.username === document.getElementById('username').value;
+            });
+            var userMedicaments = document.getElementById('user-medicament-list')
+            showMedicament(currentUser, userMedicaments);
         }
 
         function showPatients(){
@@ -657,6 +661,7 @@
         }
         
         function showMedicament(user, listItem) {
+            console.log("hi");
             // Crear la tabla
             var table = document.createElement('table');
             var caption = document.createElement('caption');
@@ -708,9 +713,6 @@
             listItem.appendChild(table);
         }
         
-        
-        
-
         // Función para mostrar los medicamentos del usuario
         function mostrarMedicamentos(user) {
             // Obtén el contenedor de la lista de medicamentos
@@ -784,47 +786,6 @@
         });    
 
 
-        // Función para show los medicamentos pedidos
-        function listDemandes() {
-            if (logged) {
-                // Obtén el usuario actual
-                var usuarioActual = usuarios.find(function(user) {
-                    return user.username === document.getElementById('username').value;
-                });
-        
-                if (usuarioActual) {
-                    // Obtén la lista de medicamentos pedidos del usuario
-                    var medicamentDemande = usuarioActual.orders[0].medicaments;
-        
-                    // Obtén el contenedor donde showás los medicamentos pedidos (reemplaza 'user-medicament-list' con el ID real)
-                    var containerDemandes = document.getElementById('user-medicament-list');
-        
-                    // Limpia el contenedor antes de agregar nuevos elementos
-                    containerDemandes.innerHTML = '';
-        
-                    // Recorre los medicamentos pedidos y crea elementos para showlos
-                    for (var medicament in medicamentDemande) {
-                        if (medicamentDemande.hasOwnProperty(medicament)) {
-                            var cantidad = medicamentDemande[medicament];
-        
-                            // Crea un elemento de lista
-                            var listItem = document.createElement('li');
-                            listItem.textContent = 'Medicament: ' + medicament + ', Quantite: ' + cantidad;
-        
-                            // Agrega el elemento de lista al contenedor
-                            containerDemandes.appendChild(listItem);
-                        }
-                    }
-        
-                    // Muestra la ventana de demandes (reemplaza 'demandes-container' con el ID real)
-                    document.getElementById('command-content').style.display = 'block';
-                } else {
-                    alert('User n\'etait pas trouvé');
-                }
-            } else {
-                alert('Indetifiez vous pour voir vos demandes.');
-            }
-        }
         
         function resetMedications(user) {
             // Restablecer medicamentos para el usuario dado
