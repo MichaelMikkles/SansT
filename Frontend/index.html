@@ -174,6 +174,15 @@
                 list-style-type: none;
                 padding: 3px;
             }
+
+            #no-demands-message {
+                background-color: #fff;
+                padding: 20px;
+                border: 1px solid #ccc;
+                text-align: center;
+                display: none; 
+            }
+            
         
             .user-item {
                 border: 1px solid #ccc;
@@ -227,7 +236,7 @@
                 display: none;
                 border: none;
                 background-color: #ffd700;
-                color: white;
+                color: black;
                 text-decoration: none;
                 float: right;
                 border-radius: 5px;
@@ -259,6 +268,37 @@
                 justify-content: space-between;
                 align-items: center;
             }
+
+            #patient-list{
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            table {
+                border-collapse: collapse;
+                width: auto;
+                margin: 5px;
+                justify-content: center;
+            }
+        
+            th, td, caption {
+                border: 1px solid #dddddd;
+                padding: 8px;
+                text-align: center;
+            }
+        
+            th {
+                background-color: #f2f2f2;
+            }
+        
+            tr:hover {
+                background-color: white;  /* Cambiar color al pasar el mouse sobre la fila */
+            }
+        
+            .user-item {
+                margin: 10px;  /* Margen alrededor de cada elemento de usuario */
+            }
             
 
         </style>
@@ -287,8 +327,8 @@
 
     <div id="admin-content">
         <h1>Commandes de Patients</h1>
-        <ul id="user-list">
-        </ul>
+        <ul id="user-list"></ul>
+        <div id="no-demands-message">il n'y a pas de demandes en cours</div>
     </div>
 
     <div id="command-content">
@@ -335,7 +375,7 @@
             </div>
 
             <div class="buttons">
-                <button id="reset-counters" class="reseter">Reinitializer</button>
+                <button id="reset-counters" class="reseter">Reinitialiser</button>
                 <button id="reset-counters" class="commander">Commander</button>
             </div>
         </div>
@@ -366,6 +406,7 @@
             document.getElementById('command-content').style.display = 'none';
             document.getElementById('patient-content').style.display = 'none';
             document.getElementById('user-medication').style.display = 'none';
+            document.getElementById('username').focus();
         }
 
         function showAdmin() {
@@ -425,20 +466,22 @@
         // Definir una estructura de datos para almacenar usuarios
         var usuarios = [
             {
+                username: "999",
+                password: "123",
+                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending", nombre: 1 } ],
+                nRoom: ""
+            },
+            {
                 username: "Mike",
                 password: "123",
-                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" } ],
+                orders: [ { medicaments: { doliprane: 1, tramadol: 0 }, status: "pending", nombre: 1} ],
                 nRoom: "1"
             },
             {
                 username: "Alex",
                 password: "123",
-                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" } ],
+                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending", nombre: 1 } ],
                 nRoom: "2"
-            },
-            {
-                username: "999",
-                password: "123"
             }
         ];
 
@@ -479,14 +522,14 @@
                 actualizarEstadoBotones();
                 document.getElementById('home-link').style.display = 'inline';
                 document.getElementById('command-link').style.display = 'inline';
-                showNombreUsuario(username);
+                showUserName(username);
                 return false;
             } else {
                 alert("Identifiant et mot de passe incorrect");
             }
         }
 
-        function showNombreUsuario(username) {
+        function showUserName(username) {
             // Muestra el nombre del usuario en el elemento con el id "user-welcome"
             var userWelcome = document.getElementById('user-welcome');
             var currentUser = usuarios.find(function (user) {
@@ -517,24 +560,26 @@
         }
         
 
-        function showUsuarios() {
+        function showUsers() {
             var userList = document.getElementById('user-list');
-            
+            var anyPatient = false;
+
             // Limpiar la lista de usuarios antes de agregar nuevos usuarios
             userList.innerHTML = '';
             
             // Generar y agregar elementos de lista para cada usuario
             usuarios.forEach(function(user) {
-                if(user.username != 999){
-                    var listItem = document.createElement('li');
-                    listItem.classList.add('user-item');
-                    listItem.textContent = 'Patient: ' + user.username + ' - ';
+                //print all patients and avoid the admins
+                if(user.username == "999"){ 
+                    return;
                 }
-        
+                var listItem = document.createElement('li');
+                listItem.classList.add('user-item');
                 // Verifica si el usuario tiene medicamentos solicitados
-                else if (user.orders && user.orders.length > 0) {
+                if (user.orders[0].medicaments.tramadol > 0 || user.orders[0].medicaments.doliprane > 0) {
+                    anyPatient = true;
+                    listItem.textContent = 'Patient: ' + user.username + ' - ';
                     listItem.textContent += '\nMedicaments commandés:';
-        
                     // Agrega los medicamentos solicitados a la lista
                     if (user.orders[0].medicaments.doliprane > 0) {
                         listItem.textContent += '\n- Doliprane: ' + user.orders[0].medicaments.doliprane;
@@ -542,27 +587,24 @@
                     if (user.orders[0].medicaments.tramadol > 0) {
                         listItem.textContent += '\n- Tramadol: ' + user.orders[0].medicaments.tramadol;
                     }
-                }
-        
-                userList.appendChild(listItem);
-                // Agrega un botón para restablecer los medicamentos de este usuario
-                if (user.username == "999") {
+
+                    // Agrega un botón para restablecer los medicamentos de este usuario
                     var acceptButton = document.createElement('button');
                     acceptButton.textContent = 'Accepter';
                     acceptButton.classList.add('accept-button');
                     acceptButton.addEventListener('click', function () {
                         // Crear una nueva orden y colocarla al principio de la lista
-                        var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" };
+                        var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending", nombre: 2 };
                         user.orders.unshift(newOrder);
                         
                         // Cambiar el estado de la orden actual a "accepted"
-                        user.orders[1].status = "accepted";
+                        user.orders[1].status = "acceptée";
                         
                         
                         alert("Les médicaments ont été acceptés");
                         
                         // Actualizar la vista de usuarios
-                        showUsuarios();
+                        showUsers();
                     });
                 
                     var rejectButton = document.createElement('button');
@@ -574,18 +616,22 @@
                         user.orders.unshift(newOrder);
                         
                         // Cambiar el estado de la orden actual a "rejected"
-                        user.orders[1].status = "rejected";
+                        user.orders[1].status = "Refusée";
                         
                         alert("Les médicaments ont été refusés");
                         
                         // Actualizar la vista de usuarios
-                        showUsuarios();
+                        showUsers();
                     });
-                
                     listItem.appendChild(acceptButton);
                     listItem.appendChild(rejectButton);
-                }                
+                    userList.appendChild(listItem);
+                }
             });
+            console.log(anyPatient)
+            if (!anyPatient){
+                document.getElementById('no-demands-message').style.display = "block";
+            }
         }
 
         function showAllPatients() {
@@ -595,7 +641,7 @@
             userList.innerHTML = '';
         
             usuarios.forEach(function(user) {
-                if (user.username !== 999) {
+                if (user.username !== "999") {
                     var listItem = document.createElement('li');
                     listItem.classList.add('patient-item');
                     listItem.textContent = 'Patient: ' + user.username;
@@ -613,38 +659,45 @@
         function showMedicament(user, listItem) {
             // Crear la tabla
             var table = document.createElement('table');
+            var caption = document.createElement('caption');
+            caption.textContent = user.username;
+            table.appendChild(caption);
+        
             var thead = document.createElement('thead');
             var tbody = document.createElement('tbody');
         
             // Crear la fila de encabezado
             var headerRow = document.createElement('tr');
             var headers = ['Commande N°', 'Doliprane', 'Tramadol', 'Status'];
-            headers.forEach(function(headerText) {
+            headers.forEach(function (headerText) {
                 var header = document.createElement('th');
                 header.textContent = headerText;
                 headerRow.appendChild(header);
             });
             thead.appendChild(headerRow);
         
-            // Crear fila de datos
-            var dataRow = document.createElement('tr');
-            var orderNumber = user.order[0].id; // Número de la orden
-            var medications = user.orders[0].medicaments;
-            var status = user.orders[0].status;
+            // Recorrer todas las órdenes del usuario
+            user.orders.forEach(function (order) {
+                var dataRow = document.createElement('tr');
+                var orderNumber = order.nombre; // Número de la orden
+                var medications = order.medicaments;
+                var status = order.status;
         
-            var dataCells = [
-                orderNumber,
-                medications.doliprane,
-                medications.tramadol,
-                status
-            ];
+                var dataCells = [
+                    orderNumber,
+                    medications.doliprane,
+                    medications.tramadol,
+                    status
+                ];
         
-            dataCells.forEach(function(cellText) {
-                var cell = document.createElement('td');
-                cell.textContent = cellText;
-                dataRow.appendChild(cell);
+                dataCells.forEach(function (cellText) {
+                    var cell = document.createElement('td');
+                    cell.textContent = cellText;
+                    dataRow.appendChild(cell);
+                });
+        
+                tbody.appendChild(dataRow);
             });
-            tbody.appendChild(dataRow);
         
             // Agregar las partes de la tabla
             table.appendChild(thead);
@@ -654,6 +707,7 @@
             listItem.innerHTML = '';
             listItem.appendChild(table);
         }
+        
         
         
 
@@ -702,11 +756,14 @@
             linkMenu.textContent = 'Home';
             var linkMenu = document.getElementById('command-link');
             linkMenu.textContent = 'Mes demandes';
+            document.getElementById('username').value =  "";
+            document.getElementById('password').value = "";
+            document.getElementById('username').focus();
         }
                
     
         // Llama a la función para show la lista de usuarios cuando la página se cargue
-        window.addEventListener('load', showUsuarios);
+        window.addEventListener('load', showUsers);
 
         
         document.getElementById('add-doliprane').addEventListener('click', function() {
@@ -773,7 +830,7 @@
             // Restablecer medicamentos para el usuario dado
             user.orders[0].medicaments = { doliprane: 0, tramadol: 0 };
             // Volver a show la lista de usuarios después del restablecimiento
-            showUsuarios();
+            showUsers();
         }
 
         function actualizarEstadoBotones() {
@@ -813,7 +870,7 @@
             document.getElementById('counter-tramadol').textContent = counterTramadol;
         
             alert(message);
-            showUsuarios();
+            showUsers();
         });
     </script>
 </body> 
