@@ -38,6 +38,8 @@
             nav a {
                 text-decoration: none;
                 color: #41981c;
+                padding: 5px;
+                border-radius: 5px;
             }
     
             #login-container {
@@ -400,6 +402,11 @@
             document.getElementById('command-content').style.display = 'none';
             document.getElementById('patient-content').style.display = 'none';
             document.getElementById('user-medication').style.display = 'none';
+            var linkMenu = document.getElementById('home-link');
+            linkMenu.style.backgroundColor = "rgb(0 0 0 / 15%)";
+            var linkMenu = document.getElementById('command-link');
+            linkMenu.style.backgroundColor = "#f0f0f0";
+
             actualizarEstadoBotones();
         }
 
@@ -421,8 +428,10 @@
             document.getElementById('patient-content').style.display = 'none';
             document.getElementById('user-medication').style.display = 'none';
             var linkMenu = document.getElementById('home-link');
+            linkMenu.style.backgroundColor = "rgb(0 0 0 / 15%)";
             linkMenu.textContent = 'Mes demandes';
             var linkMenu = document.getElementById('command-link');
+            linkMenu.style.backgroundColor = "#f0f0f0";
             linkMenu.textContent = 'Mes patients';
         }
 
@@ -452,6 +461,10 @@
 
         // Agregar eventos a los enlaces
         document.getElementById('home-link').addEventListener('click', function () {
+            var linkMenu = document.getElementById('home-link');
+            linkMenu.style.backgroundColor = "rgb(0 0 0 / 15%)";
+            var linkMenu = document.getElementById('command-link');
+            linkMenu.style.backgroundColor = "#f0f0f0";
             if (isAdmin) {
                 showAdmin();
             } else {
@@ -460,6 +473,10 @@
         });
 
         document.getElementById('command-link').addEventListener('click', function () {
+            var linkMenu = document.getElementById('home-link');
+            linkMenu.style.backgroundColor = "#f0f0f0";
+            var linkMenu = document.getElementById('command-link');
+            linkMenu.style.backgroundColor = "rgb(0 0 0 / 15%)";
             if (isAdmin) {
                 showPatients();
             } else {
