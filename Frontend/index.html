@@ -275,6 +275,10 @@
                 margin: 0;
             }
 
+            #patient-list .user-list{
+                background-color: #fff
+            }
+
             table {
                 border-collapse: collapse;
                 width: auto;
@@ -305,7 +309,7 @@
     </header>
     <nav>
         <ul>
-            <li><a href="#" id="home-link">Home</a></li>
+            <li><a href="#" id="home-link">Accueil</a></li>
             <li><a href="#" id="command-link">Mes demandes</a></li>
         </ul>
     </nav>
@@ -328,7 +332,7 @@
     <div id="admin-content">
         <h1>Commandes de Patients</h1>
         <ul id="user-list"></ul>
-        <div id="no-demands-message">il n'y a pas de demandes en cours</div>
+        <div id="no-demands-message">il n'y a pas de demande en cours</div>
     </div>
 
     <div id="command-content">
@@ -359,7 +363,7 @@
                 <img src="doliprane.jpg" alt="doliprane.jpg">
                 <p>Le Doliprane est un médicament à base de paracétamol qui soulage la douleur, comme les maux de tête, et abaisse la fièvre en inhibant les substances chimiques responsables de la douleur et de la fièvre dans le cerveau.</p>
                 <div class="counter">
-                    <button class="adder" id="add-doliprane">Add</button>
+                    <button class="adder" id="add-doliprane">+</button>
                     <span id="counter-doliprane">0</span>
                 </div>
             </div>
@@ -369,7 +373,7 @@
                 <img class="tramadol" src="tramadol.jpg" alt="tramadol.jpg">
                 <p>Le Tramadol est un médicament analgésique utilisé pour soulager la douleur modérée à sévère. Il agit en modifiant la façon dont le cerveau perçoit la douleur.</p>
                 <div class="counter">
-                    <button class="adder" id="add-tramadol">Add</button>
+                    <button class="adder" id="add-tramadol">+</button>
                     <span id="counter-tramadol">0</span>
                 </div>
             </div>
@@ -472,19 +476,19 @@
             {
                 username: "999",
                 password: "123",
-                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending", nombre: 1 } ],
+                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "En attente", nombre: 1 } ],
                 nRoom: ""
             },
             {
                 username: "Mike",
                 password: "123",
-                orders: [ { medicaments: { doliprane: 1, tramadol: 0 }, status: "pending", nombre: 1} ],
+                orders: [ { medicaments: { doliprane: 1, tramadol: 0 }, status: "En attente", nombre: 1} ],
                 nRoom: "1"
             },
             {
                 username: "Alex",
                 password: "123",
-                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending", nombre: 1 } ],
+                orders: [ { medicaments: { doliprane: 0, tramadol: 0 }, status: "En attente", nombre: 1 } ],
                 nRoom: "2"
             }
         ];
@@ -598,11 +602,12 @@
                     acceptButton.classList.add('accept-button');
                     acceptButton.addEventListener('click', function () {
                         // Crear una nueva orden y colocarla al principio de la lista
-                        var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending", nombre: 2 };
+                        var numOrder = user.orders[0].nombre +1;
+                        var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "En attente", nombre: numOrder };
                         user.orders.unshift(newOrder);
                         
                         // Cambiar el estado de la orden actual a "accepted"
-                        user.orders[1].status = "acceptée";
+                        user.orders[1].status = "Acceptée";
                         
                         
                         alert("Les médicaments ont été acceptés");
@@ -616,7 +621,8 @@
                     rejectButton.classList.add('reject-button');
                     rejectButton.addEventListener('click', function () {
                         // Crear una nueva orden y colocarla al principio de la lista
-                        var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "pending" };
+                        var numOrder = user.orders[0].nombre +1;
+                        var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "En attente", nombre: numOrder };
                         user.orders.unshift(newOrder);
                         
                         // Cambiar el estado de la orden actual a "rejected"
@@ -632,9 +638,11 @@
                     userList.appendChild(listItem);
                 }
             });
-            console.log(anyPatient)
             if (!anyPatient){
                 document.getElementById('no-demands-message').style.display = "block";
+            }
+            else{
+                document.getElementById('no-demands-message').style.display = "none";
             }
         }
 
@@ -647,7 +655,7 @@
             usuarios.forEach(function(user) {
                 if (user.username !== "999") {
                     var listItem = document.createElement('li');
-                    listItem.classList.add('patient-item');
+                    listItem.classList.add('user-item');
                     listItem.textContent = 'Patient: ' + user.username;
         
                     // Agrega evento de clic al usuario
@@ -661,7 +669,6 @@
         }
         
         function showMedicament(user, listItem) {
-            console.log("hi");
             // Crear la tabla
             var table = document.createElement('table');
             var caption = document.createElement('caption');
@@ -701,7 +708,10 @@
                     dataRow.appendChild(cell);
                 });
         
-                tbody.appendChild(dataRow);
+                // Add this check to only append the row if either doliprane or tramadol value is greater than 0
+                if (medications.doliprane > 0 || medications.tramadol > 0) {
+                    tbody.appendChild(dataRow);
+                }
             });
         
             // Agregar las partes de la tabla
@@ -755,7 +765,7 @@
             document.getElementById('user-welcome').textContent = '';
         
             var linkMenu = document.getElementById('home-link');
-            linkMenu.textContent = 'Home';
+            linkMenu.textContent = 'Accueil';
             var linkMenu = document.getElementById('command-link');
             linkMenu.textContent = 'Mes demandes';
             document.getElementById('username').value =  "";
