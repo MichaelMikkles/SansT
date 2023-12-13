@@ -9,7 +9,7 @@
     <header>
         <h1>PharmaBox</h1>
         <span id="user-welcome"></span>
-        <button id="logout-button" onclick="deconnecter()">Déconnecter</button>
+        <button id="logout-button" onclick="deconnecter()">Deconnecter</button>
         <style>
             body {
                 font-family: Arial, sans-serif;
@@ -130,10 +130,6 @@
                 align-self: flex-start;
             }
 
-            #user-welcome {
-                text                
-            }
-
             #user-welcome .numChambre {
                 margin-left: 83px;
             }
@@ -222,7 +218,7 @@
             }
         
             .user-item .reject-button {
-                background-color: #ff0000; /* Color de fondo para el botón de rechazo */
+                background-color: #ff0000; /* Color de fondo para el boton de rechazo */
                 color: white;
                 border: none;
                 padding: 8px 16px;
@@ -352,7 +348,7 @@
 
     <!--Admin patient medicaments comandes-->
     <div id="user-medication">
-        <h2>Medicaments commandés</h2>
+        <h2>Medicaments commandes</h2>
         <ul id="medication-list"></ul>
     </div>
     
@@ -363,7 +359,7 @@
             <div class="med">
                 <h2> Doliprane</h2>
                 <img src="doliprane.jpg" alt="doliprane.jpg">
-                <p>Le Doliprane est un médicament à base de paracétamol qui soulage la douleur, comme les maux de tête, et abaisse la fièvre en inhibant les substances chimiques responsables de la douleur et de la fièvre dans le cerveau.</p>
+                <p>Le Doliprane est un medicament a base de paracetamol qui soulage la douleur, comme les maux de tête, et abaisse la fievre en inhibant les substances chimiques responsables de la douleur et de la fievre dans le cerveau.</p>
                 <div class="counter">
                     <button class="adder" id="add-doliprane">+</button>
                     <span id="counter-doliprane">0</span>
@@ -373,7 +369,7 @@
             <div class="med">
                 <h2> Tramadol</h2>
                 <img class="tramadol" src="tramadol.jpg" alt="tramadol.jpg">
-                <p>Le Tramadol est un médicament analgésique utilisé pour soulager la douleur modérée à sévère. Il agit en modifiant la façon dont le cerveau perçoit la douleur.</p>
+                <p>Le Tramadol est un medicament analgesique utilise pour soulager la douleur moderee a severe. Il agit en modifiant la façon dont le cerveau perçoit la douleur.</p>
                 <div class="counter">
                     <button class="adder" id="add-tramadol">+</button>
                     <span id="counter-tramadol">0</span>
@@ -510,7 +506,7 @@
             }
         ];
 
-        // Función para verificar el inicio de sesión
+        // Funcion para verificar el inicio de sesion
         var logged = false;
 
         // Funcion para verificar si el usuario es admin
@@ -604,7 +600,7 @@
                 if (user.orders[0].medicaments.tramadol > 0 || user.orders[0].medicaments.doliprane > 0) {
                     anyPatient = true;
                     listItem.textContent = 'Patient: ' + user.username + ' - ';
-                    listItem.textContent += '\nMedicaments commandés:';
+                    listItem.textContent += '\nMedicaments commandes:';
                     // Agrega los medicamentos solicitados a la lista
                     if (user.orders[0].medicaments.doliprane > 0) {
                         listItem.textContent += '\n- Doliprane: ' + user.orders[0].medicaments.doliprane;
@@ -613,21 +609,38 @@
                         listItem.textContent += '\n- Tramadol: ' + user.orders[0].medicaments.tramadol;
                     }
 
-                    // Agrega un botón para restablecer los medicamentos de este usuario
+                    // Agrega un boton para restablecer los medicamentos de este usuario
                     var acceptButton = document.createElement('button');
                     acceptButton.textContent = 'Accepter';
                     acceptButton.classList.add('accept-button');
                     acceptButton.addEventListener('click', function () {
                         // Crear una nueva orden y colocarla al principio de la lista
+                        var tramadolAmount = user.orders[0].medicaments.tramadol;
+                        var dolipraneAmount = user.orders[0].medicaments.doliprane;
+
+                        var url = "";
+
+                        if (tramadolAmount > 0){
+                            url += "t" + tramadolAmount;
+                        }
+
+                        if (dolipraneAmount > 0) {
+                            url += "d" + dolipraneAmount;
+                        }
+
+                        var xhttp = new XMLHttpRequest();
+                        xhttp.open("GET", url, true);
+                        xhttp.send();
+
                         var numOrder = user.orders[0].nombre +1;
                         var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "En attente", nombre: numOrder };
                         user.orders.unshift(newOrder);
                         
                         // Cambiar el estado de la orden actual a "accepted"
-                        user.orders[1].status = "Acceptée";
+                        user.orders[1].status = "Acceptee";
                         
                         
-                        alert("Les médicaments ont été acceptés");
+                        alert("Les medicaments ont ete acceptes");
                         
                         // Actualizar la vista de usuarios
                         showUsers();
@@ -638,14 +651,18 @@
                     rejectButton.classList.add('reject-button');
                     rejectButton.addEventListener('click', function () {
                         // Crear una nueva orden y colocarla al principio de la lista
+                        var xhttp = new XMLHttpRequest();
+                        xhttp.open("GET", "off", true);
+                        xhttp.send();
+
                         var numOrder = user.orders[0].nombre +1;
                         var newOrder = { medicaments: { doliprane: 0, tramadol: 0 }, status: "En attente", nombre: numOrder };
                         user.orders.unshift(newOrder);
                         
                         // Cambiar el estado de la orden actual a "rejected"
-                        user.orders[1].status = "Refusée";
+                        user.orders[1].status = "Refusee";
                         
-                        alert("Les médicaments ont été refusés");
+                        alert("Les medicaments ont ete refuses");
                         
                         // Actualizar la vista de usuarios
                         showUsers();
@@ -705,7 +722,7 @@
             });
             thead.appendChild(headerRow);
         
-            // Recorrer todas las órdenes del usuario
+            // Recorrer todas las ordenes del usuario
             user.orders.forEach(function (order) {
                 var dataRow = document.createElement('tr');
                 var orderNumber = order.nombre; // Número de la orden
@@ -740,9 +757,9 @@
             listItem.appendChild(table);
         }
         
-        // Función para mostrar los medicamentos del usuario
+        // Funcion para mostrar los medicamentos del usuario
         function mostrarMedicamentos(user) {
-            // Obtén el contenedor de la lista de medicamentos
+            // Obten el contenedor de la lista de medicamentos
             var medicationListContainer = document.getElementById('medication-list');
             
             // Limpia el contenido anterior
@@ -766,13 +783,13 @@
 
         
         function deconnecter() {
-            // Restablece el estado de la aplicación para show la vista de inicio de sesión
+            // Restablece el estado de la aplicacion para show la vista de inicio de sesion
             showLogin();
         
-            // También podrías restablecer cualquier otra información relacionada con la sesión
-            // como reiniciar contadores, ocultar información del usuario actual, etc.
+            // Tambien podrías restablecer cualquier otra informacion relacionada con la sesion
+            // como reiniciar contadores, ocultar informacion del usuario actual, etc.
         
-            // Restablece la variable de sesión
+            // Restablece la variable de sesion
             logged = false;
             isAdmin = false;
             document.getElementById('logout-button').style.display = 'none';
@@ -791,7 +808,7 @@
         }
                
     
-        // Llama a la función para show la lista de usuarios cuando la página se cargue
+        // Llama a la funcion para show la lista de usuarios cuando la pagina se cargue
         window.addEventListener('load', showUsers);
 
         
@@ -817,12 +834,12 @@
         function resetMedications(user) {
             // Restablecer medicamentos para el usuario dado
             user.orders[0].medicaments = { doliprane: 0, tramadol: 0 };
-            // Volver a show la lista de usuarios después del restablecimiento
+            // Volver a show la lista de usuarios despues del restablecimiento
             showUsers();
         }
 
         function actualizarEstadoBotones() {
-            // Obtén todos los botones que deseas desactivar
+            // Obten todos los botones que deseas desactivar
             var botones = document.querySelectorAll('.accept-button, .reject-button, .commander, .adder, .reseter');
         
             // Itera sobre los botones y establece su estado según la variable logged
@@ -832,6 +849,9 @@
         }
 
         document.querySelector('.commander').addEventListener('click', function() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", "p", true);
+            xhttp.send();
             var quantityDoliprane = counterDoliprane;
             var quantityTramadol = counterTramadol;
 
@@ -839,7 +859,7 @@
                 return user.username === document.getElementById('username').value;
             });
         
-            var message = "Vous avez commandé:\n";
+            var message = "Vous avez commande:\n";
             if (quantityDoliprane > 0) {
                 message += quantityDoliprane + " Doliprane\n";
             }
@@ -848,7 +868,7 @@
             }
         
             if (quantityDoliprane === 0 && quantityTramadol === 0) {
-                message = "Aucun médicament sélectionné.";
+                message = "Aucun medicament selectionne.";
             }
             usuarioActual.orders[0].medicaments.doliprane += counterDoliprane;
             usuarioActual.orders[0].medicaments.tramadol += counterTramadol;
