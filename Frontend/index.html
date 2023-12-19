@@ -307,8 +307,8 @@
     </header>
     <nav>
         <ul>
-            <li><a href="#" id="home-link">Accueil</a></li>
-            <li><a href="#" id="command-link">Mes demandes</a></li>
+            <li><a id="home-link">Accueil</a></li>
+            <li><a id="command-link">Mes demandes</a></li>
         </ul>
     </nav>
 
@@ -621,11 +621,11 @@
                         var url = "";
 
                         if (tramadolAmount > 0){
-                            url += "t" + tramadolAmount;
+                            url += "t" + tramadolAmount.toString();
                         }
-
+                        
                         if (dolipraneAmount > 0) {
-                            url += "d" + dolipraneAmount;
+                            url += "d" + dolipraneAmount.toString();
                         }
 
                         var xhttp = new XMLHttpRequest();
